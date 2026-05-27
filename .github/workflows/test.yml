@@ -1,0 +1,63 @@
+name: brew test-bot
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  # Weekly cron catches "upstream tarball moved" or "sha256 mismatch after
+  # force-rebuild" without us having to push to find out.
+  schedule:
+    - cron: "0 14 * * 1"  # Monday 14:00 UTC
+
+# Cancel in-flight runs for the same ref when a new push arrives.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: macos-14  # Apple Silicon — matches `depends_on arch: :arm64`
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out tap
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Homebrew
+        id: setup-brew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Tap this repo
+        run: brew tap aimer1124/tap "$GITHUB_WORKSPACE"
+
+      - name: brew style
+        run: brew style aimer1124/tap
+
+      - name: brew audit (new + strict)
+        run: brew audit --strict --formula aimer1124/tap/local-voice-input
+
+      - name: brew install (from upstream tarball)
+        # Uses the URL pinned in the formula → real release tarball + real
+        # hud binary resource. If either drifts, this step fails.
+        run: brew install --verbose aimer1124/tap/local-voice-input
+
+      - name: brew test (formula assertions)
+        run: brew test aimer1124/tap/local-voice-input
+
+      - name: Sanity check installed binary
+        run: |
+          set -e
+          which vinput
+          vinput --version
+          vinput --help | grep -q "vinput setup"
+
+      - name: Show install footprint
+        if: always()
+        run: |
+          echo "--- prefix tree ---"
+          find "$(brew --prefix local-voice-input)" -maxdepth 4 -print
+          echo "--- linkage ---"
+          ls -l "$(brew --prefix)/bin/vinput" || true
