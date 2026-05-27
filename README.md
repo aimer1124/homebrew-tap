@@ -1,5 +1,7 @@
 # aimer1124/homebrew-tap
 
+[![brew test-bot](https://github.com/aimer1124/homebrew-tap/actions/workflows/test.yml/badge.svg)](https://github.com/aimer1124/homebrew-tap/actions/workflows/test.yml)
+
 Homebrew tap for [aimer1124](https://github.com/aimer1124)'s tools.
 
 ## Usage
