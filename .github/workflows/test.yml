@@ -22,13 +22,13 @@ jobs:
 
     steps:
       - name: Check out tap
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1
 
       - name: Set up Homebrew
         id: setup-brew
-        uses: Homebrew/actions/setup-homebrew@master
+        uses: Homebrew/actions/setup-homebrew@main
 
       - name: Link checkout as the tap
         # Tests the code on THIS commit (incl. PRs), not whatever's on
