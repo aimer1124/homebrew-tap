@@ -30,8 +30,15 @@ jobs:
         id: setup-brew
         uses: Homebrew/actions/setup-homebrew@master
 
-      - name: Tap this repo
-        run: brew tap aimer1124/tap "$GITHUB_WORKSPACE"
+      - name: Link checkout as the tap
+        # Tests the code on THIS commit (incl. PRs), not whatever's on
+        # main remotely. `brew tap` won't accept a local path, so symlink
+        # the checkout into the expected tap directory directly.
+        run: |
+          TAP_DIR="$(brew --repository)/Library/Taps/aimer1124/homebrew-tap"
+          mkdir -p "$(dirname "$TAP_DIR")"
+          ln -s "$GITHUB_WORKSPACE" "$TAP_DIR"
+          ls -la "$TAP_DIR/Formula/"
 
       - name: brew style
         run: brew style aimer1124/tap
