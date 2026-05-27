@@ -4,13 +4,13 @@ class LocalVoiceInput < Formula
   url "https://github.com/aimer1124/local-voice-input/archive/refs/tags/v1.1.1.tar.gz"
   sha256 "88ee73043a6c40b88f8f5e06efed892e0ac2451796f067c80b9757a140d349ef"
   license "MIT"
-  version "1.1.1"
 
+  depends_on arch: :arm64
   depends_on "jq"
+  depends_on :macos
   depends_on "ollama"
   depends_on "sox"
   depends_on "whisper-cpp"
-  depends_on :macos
 
   # Pre-built HUD binary (arm64 only for now; CI runner is macos-14 / Apple Silicon)
   resource "hud" do
