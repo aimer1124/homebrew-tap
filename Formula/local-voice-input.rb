@@ -1,8 +1,8 @@
 class LocalVoiceInput < Formula
   desc "Offline voice-to-prompt input for macOS (Whisper.cpp + Ollama + Raycast)"
   homepage "https://github.com/aimer1124/local-voice-input"
-  url "https://github.com/aimer1124/local-voice-input/archive/refs/tags/v1.4.0.tar.gz"
-  sha256 "6870a6cc12ed7e12d63f48eabbe7e18a17485a52ebaafb651fe3e58a7fd30a8f"
+  url "https://github.com/aimer1124/local-voice-input/archive/refs/tags/v1.5.0.tar.gz"
+  sha256 "438a93edd598c724d17ee24f4c61839698769982f78c3edf15c4eca928e613c8"
   license "MIT"
 
   depends_on arch: :arm64
@@ -14,8 +14,8 @@ class LocalVoiceInput < Formula
 
   # Pre-built HUD binary (arm64 only for now; CI runner is macos-14 / Apple Silicon)
   resource "hud" do
-    url "https://github.com/aimer1124/local-voice-input/releases/download/v1.4.0/hud"
-    sha256 "23df9baac441226c6ad6beab6f2679097a64f9338cd4b507a83bf0760e441835"
+    url "https://github.com/aimer1124/local-voice-input/releases/download/v1.5.0/hud"
+    sha256 "5c9faa10e820cf10794bdf9ba8df7f542a96f84699e04010a9e20d5f877085ef"
   end
 
   def install
