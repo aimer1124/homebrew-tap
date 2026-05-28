@@ -1,8 +1,8 @@
 class LocalVoiceInput < Formula
   desc "Offline voice-to-prompt input for macOS (Whisper.cpp + Ollama + Raycast)"
   homepage "https://github.com/aimer1124/local-voice-input"
-  url "https://github.com/aimer1124/local-voice-input/archive/refs/tags/v1.2.0.tar.gz"
-  sha256 "7e1d874250f2b0a9670ea26e885668961190b820d9c94960de1caea76c7b8a37"
+  url "https://github.com/aimer1124/local-voice-input/archive/refs/tags/v1.3.0.tar.gz"
+  sha256 "6367355baab4ba033793791aa7ebe1f58d00d90d7ed1e952b34230330c302bb4"
   license "MIT"
 
   depends_on arch: :arm64
@@ -14,7 +14,7 @@ class LocalVoiceInput < Formula
 
   # Pre-built HUD binary (arm64 only for now; CI runner is macos-14 / Apple Silicon)
   resource "hud" do
-    url "https://github.com/aimer1124/local-voice-input/releases/download/v1.2.0/hud"
+    url "https://github.com/aimer1124/local-voice-input/releases/download/v1.3.0/hud"
     sha256 "23df9baac441226c6ad6beab6f2679097a64f9338cd4b507a83bf0760e441835"
   end
 
@@ -22,7 +22,7 @@ class LocalVoiceInput < Formula
     # Runtime scripts under libexec/bin so `bin/vinput` symlink keeps the
     # ../config, ../raycast, ../src relative paths intact.
     (libexec/"bin").install "bin/vinput", "bin/vinput.sh", "bin/vinput_bg.sh"
-    (libexec/"raycast").install "raycast/voice-input.sh"
+    (libexec/"raycast").install Dir["raycast/*"]
     (libexec/"config").install Dir["config/*"]
     (libexec/"src").install Dir["src/*"]
 
@@ -49,7 +49,9 @@ class LocalVoiceInput < Formula
         2. System Settings → Privacy → Accessibility: ✅ Raycast (for ⌘V auto-paste)
         3. Raycast → Extensions → Script Commands:
              add directory ~/.config/raycast-scripts
-             bind a hotkey to "🎙️ 语音输入" (recommended ⌘⇧Space)
+             bind hotkeys:
+               🎙️ 语音输入         (recommended ⌘⇧Space)  full pipeline (Whisper + LLM)
+               📝 语音输入 (Raw)   (recommended ⌥Space)   Whisper only, no LLM cleanup
 
       Verify everything is green:
 
