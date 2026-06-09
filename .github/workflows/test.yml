@@ -20,6 +20,13 @@ jobs:
     runs-on: macos-14  # Apple Silicon — matches `depends_on arch: :arm64`
     timeout-minutes: 30
 
+    # GitHub release assets (the hud binary) can cold-start with a transient 504
+    # right after a tag is pushed. Tell Homebrew's curl layer to retry transient
+    # HTTP errors (curl --retry covers 408/429/5xx incl. 504) instead of failing
+    # the whole run on the first blip.
+    env:
+      HOMEBREW_CURL_RETRIES: "5"
+
     steps:
       - name: Check out tap
         uses: actions/checkout@v5
@@ -48,8 +55,25 @@ jobs:
 
       - name: brew install (from upstream tarball)
         # Uses the URL pinned in the formula → real release tarball + real
-        # hud binary resource. If either drifts, this step fails.
-        run: brew install --verbose aimer1124/tap/local-voice-input
+        # hud binary resource. If either drifts (sha mismatch / 404), this fails.
+        # Retry loop is purely for transient network blips (504 on a cold release
+        # asset): a real drift fails identically on every attempt, so retries
+        # don't mask genuine problems. The source tarball is sha-cached after the
+        # first attempt, so a retry only re-fetches whatever actually failed.
+        run: |
+          for attempt in 1 2 3; do
+            echo "::group::brew install attempt $attempt"
+            if brew install --verbose aimer1124/tap/local-voice-input; then
+              echo "::endgroup::"
+              echo "✓ installed on attempt $attempt"
+              exit 0
+            fi
+            echo "::endgroup::"
+            echo "attempt $attempt failed; backing off before retry..."
+            sleep $((attempt * 20))
+          done
+          echo "✗ brew install failed after 3 attempts" >&2
+          exit 1
 
       - name: brew test (formula assertions)
         run: brew test aimer1124/tap/local-voice-input
